@@ -13,6 +13,7 @@
 		4BFA33A01B69205000255041 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4BFA339F1B69205000255041 /* Images.xcassets */; };
 		4BFA33A31B69205000255041 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4BFA33A11B69205000255041 /* LaunchScreen.xib */; };
 		4BFA33AF1B69205000255041 /* Secret_messageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BFA33AE1B69205000255041 /* Secret_messageTests.swift */; };
+		4BFA33B91B6933DD00255041 /* MessageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BFA33B81B6933DD00255041 /* MessageViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,6 +37,7 @@
 		4BFA33A81B69205000255041 /* Secret messageTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Secret messageTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BFA33AD1B69205000255041 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4BFA33AE1B69205000255041 /* Secret_messageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Secret_messageTests.swift; sourceTree = "<group>"; };
+		4BFA33B81B6933DD00255041 /* MessageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,6 +81,7 @@
 			children = (
 				4BFA33981B69205000255041 /* AppDelegate.swift */,
 				4BFA339A1B69205000255041 /* ViewController.swift */,
+				4BFA33B81B6933DD00255041 /* MessageViewController.swift */,
 				4BFA339C1B69205000255041 /* Main.storyboard */,
 				4BFA339F1B69205000255041 /* Images.xcassets */,
 				4BFA33A11B69205000255041 /* LaunchScreen.xib */,
@@ -213,6 +216,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4BFA339B1B69205000255041 /* ViewController.swift in Sources */,
+				4BFA33B91B6933DD00255041 /* MessageViewController.swift in Sources */,
 				4BFA33991B69205000255041 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -340,7 +344,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				INFOPLIST_FILE = "Secret message/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -350,7 +356,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				INFOPLIST_FILE = "Secret message/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
