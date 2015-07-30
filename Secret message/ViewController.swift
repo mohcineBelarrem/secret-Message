@@ -64,6 +64,7 @@ class ViewController: UIViewController {
             
             mvc.token = self.token
             mvc.email = self.emailField.text
+            mvc.password = self.passwordField.text
             
         }
     }
