@@ -13,6 +13,7 @@ import Foundation
 class ViewController: UIViewController {
     
     
+    var token : String = ""
     
     @IBOutlet var emailField: UITextField!
     
@@ -23,20 +24,17 @@ class ViewController: UIViewController {
     @IBAction func login(sender: AnyObject) {
         
         
-        self.loginRequest(["email":"\(emailField.text))", "password":"\(passwordField.text)"], url: "http:/recruiting.api.fitle.com/user/token")
-        
-        println("\(emailField.text)")
-        
-        println("\(passwordField.text)")
-        
+        self.loginRequest("http:/recruiting.api.fitle.com/user/token")
         
         self.view.endEditing(true)
+        
+        println("jetton: " + self.token)
         
     }
     
     @IBAction func register(sender: AnyObject) {
         
-        self.registerRequest(["email":"\(emailField.text))", "password":"\(passwordField.text)"], url: "http:/recruiting.api.fitle.com/user/create")
+        self.createRequest("http:/recruiting.api.fitle.com/user/create")
         
         self.view.endEditing(true)
     }
@@ -44,10 +42,6 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        
-        
-        // self.post(["email":"testios@ios.com", "password":"password"], url: "http:/recruiting.api.fitle.com/user/create")
-        
         
         
         
@@ -59,15 +53,32 @@ class ViewController: UIViewController {
     }
     
     
-    func registerRequest(params : Dictionary<String, String>, url : String) {
-        var request = NSMutableURLRequest(URL: NSURL(string: url)!)
-        var session = NSURLSession.sharedSession()
+    
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        
+        
+        if segue.identifier == "loginSegue" {
+            
+            let mvc = segue.destinationViewController as! MessageViewController
+            
+            mvc.token = self.token
+            mvc.email = self.emailField.text
+            
+        }
+    }
+    
+    func loginRequest(url : String) {
+        
+        let myUrl = NSURL(string: url)
+        let session = NSURLSession.sharedSession()
+        let request = NSMutableURLRequest(URL:myUrl!)
         request.HTTPMethod = "POST"
         
-        var err: NSError?
-        request.HTTPBody = NSJSONSerialization.dataWithJSONObject(params, options: nil, error: &err)
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.addValue("application/json", forHTTPHeaderField: "Accept")
+        // Compose a query string
+        let postString = "email=\(emailField.text)&password=\(passwordField.text)"
+        
+        request.HTTPBody = postString.dataUsingEncoding(NSUTF8StringEncoding);
         
         var task = session.dataTaskWithRequest(request, completionHandler: {data, response, error -> Void in
             println("Response: \(response)")
@@ -91,14 +102,17 @@ class ViewController: UIViewController {
                     
                     if let token = parseJSON["token"] as? String {
                         
-                        self.resultLabel.text = "account created Succesfuly"
-                        println("success")
+                        self.token = token
+                        
+                        self.performSegueWithIdentifier("loginSegue", sender: self)
                     }
                         
                     else {
                         
-                        self.resultLabel.text = parseJSON["error"] as? String
-                        println("account already existing")
+                        let errorString = (parseJSON["error"] as? String)!
+                        
+                        println(errorString)
+                        
                     }
                     
                     
@@ -112,62 +126,146 @@ class ViewController: UIViewController {
             }
         })
         
+        
+        
         task.resume()
+        
     }
     
-    func loginRequest(params : Dictionary<String, String>, url : String) {
-        var request = NSMutableURLRequest(URL: NSURL(string: url)!)
-        var session = NSURLSession.sharedSession()
-        request.HTTPMethod = "POST"
-        
+    
+    
+
+
+
+func createRequest(url : String) {
+    
+    let myUrl = NSURL(string: url)
+    let session = NSURLSession.sharedSession()
+    let request = NSMutableURLRequest(URL:myUrl!)
+    request.HTTPMethod = "POST"
+    
+    // Compose a query string
+    let postString = "email=\(emailField.text)&password=\(passwordField.text)"
+    
+    request.HTTPBody = postString.dataUsingEncoding(NSUTF8StringEncoding);
+    
+    var task = session.dataTaskWithRequest(request, completionHandler: {data, response, error -> Void in
+        println("Response: \(response)")
+        var strData = NSString(data: data, encoding: NSUTF8StringEncoding)
+        println("Body: \(strData)")
         var err: NSError?
-        request.HTTPBody = NSJSONSerialization.dataWithJSONObject(params, options: nil, error: &err)
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.addValue("application/json", forHTTPHeaderField: "Accept")
+        var json = NSJSONSerialization.JSONObjectWithData(data, options: .MutableLeaves, error: &err) as? NSDictionary
         
-        var task = session.dataTaskWithRequest(request, completionHandler: {data, response, error -> Void in
-            println("Response: \(response)")
-            var strData = NSString(data: data, encoding: NSUTF8StringEncoding)
-            println("Body: \(strData)")
-            var err: NSError?
-            var json = NSJSONSerialization.JSONObjectWithData(data, options: .MutableLeaves, error: &err) as? NSDictionary
-            
-            // Did the JSONObjectWithData constructor return an error? If so, log the error to the console
-            if(err != nil) {
-                println(err!.localizedDescription)
-                let jsonStr = NSString(data: data, encoding: NSUTF8StringEncoding)
-                println("Error could not parse JSON: '\(jsonStr)'")
+        // Did the JSONObjectWithData constructor return an error? If so, log the error to the console
+        if(err != nil) {
+            println(err!.localizedDescription)
+            let jsonStr = NSString(data: data, encoding: NSUTF8StringEncoding)
+            println("Error could not parse JSON: '\(jsonStr)'")
+        }
+        else {
+            // The JSONObjectWithData constructor didn't return an error. But, we should still
+            // check and make sure that json has a value using optional binding.
+            if let parseJSON = json {
+                // Okay, the parsedJSON is here, let's get the value for 'success' out of it
+                
+                
+                if let token = parseJSON["token"] as? String {
+                    
+                   self.resultLabel.text = "account successfuly created"
+                }
+                    
+                else {
+                    
+                    let errorString = (parseJSON["error"] as? String)!
+                    
+                     self.resultLabel.text = errorString
+                    
+                }
+                
+                
+                
             }
             else {
-                // The JSONObjectWithData constructor didn't return an error. But, we should still
-                
-                if let parseJSON = json {
-                    
-                    
-                    if let token = parseJSON["token"] as? String {
-                        
-                        self.performSegueWithIdentifier("loginSegue", sender:self)
-                    }
-                        
-                    else {
-                        
-                        self.resultLabel.text = parseJSON["error"] as? String
-                        println("error in you email or password")
-                    }
-                    
-                    
-                }
-                else {
-                    // Woa, okay the json object was nil, something went worng. Maybe the server isn't running?
-                    let jsonStr = NSString(data: data, encoding: NSUTF8StringEncoding)
-                    //println("Error could not parse JSON: \(jsonStr)")
-                }
+                // Woa, okay the json object was nil, something went worng. Maybe the server isn't running?
+                let jsonStr = NSString(data: data, encoding: NSUTF8StringEncoding)
+                //println("Error could not parse JSON: \(jsonStr)")
             }
-        })
-        
-        task.resume()
-    }
+        }
+    })
     
+    
+    
+    task.resume()
     
 }
 
+
+
+
+}//end of class
+
+
+
+
+
+
+// old request method
+//
+//func registerRequest(params : Dictionary<String, String>, url : String) {
+//    var request = NSMutableURLRequest(URL: NSURL(string: url)!)
+//    var session = NSURLSession.sharedSession()
+//    request.HTTPMethod = "POST"
+//
+//    var err: NSError?
+//    request.HTTPBody = NSJSONSerialization.dataWithJSONObject(params, options: nil, error: &err)
+//    request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+//    request.addValue("application/json", forHTTPHeaderField: "Accept")
+//
+//    var task = session.dataTaskWithRequest(request, completionHandler: {data, response, error -> Void in
+//        println("Response: \(response)")
+//        var strData = NSString(data: data, encoding: NSUTF8StringEncoding)
+//        println("Body: \(strData)")
+//        var err: NSError?
+//        var json = NSJSONSerialization.JSONObjectWithData(data, options: .MutableLeaves, error: &err) as? NSDictionary
+//
+//        // Did the JSONObjectWithData constructor return an error? If so, log the error to the console
+//        if(err != nil) {
+//            println(err!.localizedDescription)
+//            let jsonStr = NSString(data: data, encoding: NSUTF8StringEncoding)
+//            println("Error could not parse JSON: '\(jsonStr)'")
+//        }
+//        else {
+//            // The JSONObjectWithData constructor didn't return an error. But, we should still
+//            // check and make sure that json has a value using optional binding.
+//            if let parseJSON = json {
+//                // Okay, the parsedJSON is here, let's get the value for 'success' out of it
+//
+//
+//                if let token = parseJSON["token"] as? String {
+//
+//                    self.resultLabel.text = "account created Succesfuly"
+//                    println("success")
+//                }
+//
+//                else {
+//
+//                    self.resultLabel.text = parseJSON["error"] as? String
+//                    println("account already existing")
+//                }
+//
+//
+//
+//            }
+//            else {
+//                // Woa, okay the json object was nil, something went worng. Maybe the server isn't running?
+//                let jsonStr = NSString(data: data, encoding: NSUTF8StringEncoding)
+//                //println("Error could not parse JSON: \(jsonStr)")
+//            }
+//        }
+//    })
+//
+//    task.resume()
+//}
+//
+//
+//
